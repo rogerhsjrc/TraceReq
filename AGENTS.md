@@ -23,15 +23,17 @@ The first vertical slice is limited to:
 
 Do not add authentication, authorization, approvals, attachments, notifications, advanced audit trails, or complete multi-tenancy as part of that slice. An unauthenticated local demo is not production-ready; say so explicitly.
 
+Its request record contains only a server-generated ULID `id`, `title`, `description`, decimal-string `requested_amount`, `currency_code`, `created_at`, and `updated_at`. A human-readable request reference is deferred until organization-aware sequencing exists.
+
 ## Architectural direction
 
 Use three concerns pragmatically:
 
 - **Domain** names business concepts and holds business rules only when they exist.
-- **Application** coordinates the `CreateRequest`, `ListRequests`, and `ViewRequest` use cases.
+- **Application** coordinates the `CreateRequest`, `ListRequests`, and `ViewRequest` use cases; validated create input crosses this boundary in a `CreateRequestData` DTO.
 - **Infrastructure** contains Laravel HTTP routing, validation, JSON resources, Eloquent persistence, migrations, and the Vue API adapter.
 
-Keep Laravel conventions visible. Simple CRUD may use Eloquent directly from a small application action. Do not introduce repository interfaces, a generic service layer, DTO hierarchies, event buses, or a Pinia store without a concrete need. Controllers should translate HTTP input/output, not contain the use case. Vue views should compose feature components and call a small request API module.
+Add a `Money` value object because fixed-precision monetary handling is a genuine reusable domain concern. Keep Laravel conventions visible: application actions deliberately use Eloquent directly for this CRUD-sized slice. Defer repository contracts until persistence substitution, complex aggregate persistence, tenant-aware queries, or workflow complexity creates a concrete need. Do not introduce a generic service layer, DTO hierarchies, event buses, empty placeholder folders, or a Pinia store without a concrete need. Controllers should translate HTTP input/output, not contain the use case. Vue views should compose feature components and call a small request API module using native `fetch` and relative `/api` paths.
 
 See `docs/ARCHITECTURE.md` for the proposed paths and dependency direction.
 
@@ -41,6 +43,8 @@ See `docs/ARCHITECTURE.md` for the proposed paths and dependency direction.
 - Preserve unrelated user changes and ignored local environment files.
 - Never commit `.env`, `vendor/`, `node_modules/`, build output, logs, or secrets.
 - Keep the API under `/api`; the Vue SPA remains an independently served application.
+- Use PostgreSQL for the local application and recorded demonstration. SQLite `:memory:` is permitted only for fast initial portable feature tests and does not validate PostgreSQL-specific behavior.
+- Add PostgreSQL integration tests before relying on PostgreSQL-specific constraints, indexes, concurrency behavior, or SQL features.
 - Return JSON for API success and validation/error responses.
 - Represent decimal money as strings at the API boundary; do not use floating-point arithmetic for money.
 - Keep migrations reversible and tests deterministic.
@@ -68,7 +72,7 @@ npm run build
 npm run lint
 ```
 
-The frontend declares Node `^22.18.0 || >=24.12.0`; use a compatible runtime. At the time this guide was written, the local Node 22.14.0 installation did not meet that constraint. `npm run lint` is configured to apply fixes, so inspect its diff.
+Use Node 24 LTS as the canonical frontend development runtime, with Node 24.12.0 or newer in that LTS line. The compatible package engine declaration remains `^22.18.0 || >=24.12.0`, but the previous local Node 22.14.0 installation did not satisfy it. `npm run lint` is configured to apply fixes, so inspect its diff.
 
 ## Verification before handoff
 

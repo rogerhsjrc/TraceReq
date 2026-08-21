@@ -8,11 +8,11 @@ The walkthrough should demonstrate one end-to-end idea clearly: Vue collects an 
 
 ## Preparation
 
-- Use a Node version satisfying `^22.18.0 || >=24.12.0`.
+- Use Node 24 LTS, version 24.12.0 or newer in that line. The previous local Node 22.14.0 runtime was below the package's declared engine requirement.
 - Install backend and frontend dependencies.
-- Start from a fresh, migrated demo database with a known small dataset.
+- Start from a fresh, migrated PostgreSQL demo database with a known small dataset.
 - Run backend tests and the frontend production build before recording.
-- Start Laravel and Vite on the documented local origins.
+- Start Laravel at `http://127.0.0.1:8000` and Vite with its development `/api` proxy targeting Laravel.
 - Open the request list and keep terminals at readable font sizes.
 - Do not show `.env`, tokens, credentials, personal data, or unrelated local changes.
 
@@ -24,11 +24,11 @@ State that `backend/` is an independent Laravel JSON API and `frontend/` is an i
 
 ### 0:35–1:20 — Show the architecture in code
 
-Open the three request routes and one thin controller method. Follow a create call into its application action, then point to the Eloquent model/migration and JSON resource. Explain that Domain, Application, and Infrastructure are responsibilities: simple validation stays simple, and there is no repository abstraction without a real substitution need.
+Open the three request routes and one thin controller method. Follow the create path: Form Request → thin controller → `CreateRequest` → `CreateRequestData` → `Money` → Eloquent model → PostgreSQL → JSON Resource. Explain that `Money` represents a real domain invariant, while direct Eloquent use is a deliberate pragmatic choice for this CRUD-sized slice. Repository contracts remain appropriate later for persistence substitution, complex aggregates, tenant-aware queries, or approval workflows.
 
 ### 1:20–2:20 — Create through Vue
 
-Open `/requests/new`. Briefly show the Vue form and request API adapter, then submit a valid request. Point out the `POST /api/requests` call, `201` response, decimal-string amount, server-generated ID, and timestamps.
+Open `/requests/new`. Briefly show the Vue form and native `fetch` adapter calling the relative `/api/requests` path through the Vite proxy, then submit a valid request. Point out the `201` response, decimal-string amount, server-generated ULID, and timestamps. Note that no human-readable reference is part of this slice.
 
 Spend a few seconds submitting one invalid value so the `422` field error is visible, then return to the successful flow. Do not imply that a user is authenticated.
 
@@ -42,11 +42,11 @@ Open the request detail route, refresh it directly, and show `GET /api/requests/
 
 ### 3:50–4:35 — Show verification
 
-Run or show the completed backend feature tests covering create, validation, list order, detail, and `404`. Show the successful frontend production build. Avoid spending the demo on framework-generated example tests.
+Run or show the `Money` unit tests and completed `RefreshDatabase` feature tests covering create, validation, persistence, list order, consistent serialization, detail, and `404`. Explain briefly that fast SQLite `:memory:` tests do not prove PostgreSQL-specific behavior; the live demonstration is the PostgreSQL path, and database-specific features will require PostgreSQL integration tests. Show the successful frontend lint and production build. Avoid spending the demo on framework-generated example tests.
 
 ### 4:35–5:00 — Close with boundaries
 
-Recap the full path: Vue form → fetch adapter → Laravel route/controller → application action → Eloquent/database → JSON resource → Vue list/detail. Close by naming the deferred capabilities and noting that authentication/tenant design must precede production exposure.
+Recap the full path: Vue → native fetch → Vite `/api` proxy → Laravel route → Form Request → thin controller → `CreateRequest` → `CreateRequestData` → `Money` → Eloquent → PostgreSQL → JSON Resource → Vue. Close by naming the deferred capabilities and stating that the unauthenticated endpoints are controlled-local-demo only and must not be exposed publicly.
 
 ## Presenter notes
 
@@ -55,6 +55,7 @@ Recap the full path: Vue form → fetch adapter → Laravel route/controller →
 - Describe only behavior visible in the checked-out code.
 - If a check is not green, state that directly; do not substitute a cached build or prerecorded response.
 - Keep the data dictionary off the main path unless asked; explain that it is a broader future proposal.
+- Describe the Vite proxy as local-development plumbing, not production deployment architecture.
 
 ## Fallback if feature implementation is not ready
 
