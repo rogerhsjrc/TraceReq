@@ -2,7 +2,7 @@
 
 ## Scope statement
 
-The immediate MVP is one complete, demonstrable vertical slice for internal requests: create, list, and view. It is not implemented as of this document.
+The immediate MVP is one complete, demonstrable vertical slice for internal requests: create, list, and view. Its Laravel API is implemented; its Vue views remain to be implemented.
 
 It consists only of `POST /api/requests`, `GET /api/requests`, `GET /api/requests/{id}`, and the matching Vue create, list, and detail views. The local application and recorded demonstration use PostgreSQL.
 

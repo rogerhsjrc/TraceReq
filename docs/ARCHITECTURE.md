@@ -2,7 +2,7 @@
 
 ## Status
 
-This document records the target architecture for the first request vertical slice. The described feature folders and endpoints are proposed; they do not exist yet.
+This document records the architecture for the first request vertical slice. The backend request folders and endpoints are implemented; the described frontend feature folders and views remain proposed.
 
 ## System context
 
@@ -18,9 +18,9 @@ The backend owns validation, persistence, ordering, identifiers, and response sh
 
 ## Current repository baseline
 
-The backend is Laravel 13 with the default `User` model and framework migrations, a Sanctum-protected `/api/user` scaffold route, a Blade welcome page, Laravel-side Vite/Tailwind setup, and example Pest/PHPUnit tests. The frontend is a Vue 3/Vite scaffold with an empty router and the example Pinia counter. There is no request model, migration, controller, application action, API client, or request screen.
+The backend is Laravel 13 and now contains the request model, migration, application actions, API controller, Form Request, JSON resource, factory, routes, and focused Pest tests. The unrelated `/api/user` scaffold route and generated example tests were removed; Sanctum remains installed for a future increment. The frontend is still a Vue 3/Vite scaffold with an empty router and the example Pinia counter, with no request API client or request screen.
 
-The scaffold's `.env.example` and Laravel configuration currently default to SQLite, while PostgreSQL is available as a configured connection. The feature implementation must make PostgreSQL the local application and demonstration database without committing credentials or machine-specific settings. PHPUnit currently selects SQLite `:memory:`; that remains acceptable for the first portable feature tests, subject to the testing limits below.
+Laravel's configuration fallback remains SQLite, while `.env.example` now documents blank PostgreSQL connection placeholders for local application setup without credentials or machine-specific secrets. PHPUnit selects SQLite `:memory:` for the portable feature tests, subject to the testing limits below.
 
 ## Modular concerns
 

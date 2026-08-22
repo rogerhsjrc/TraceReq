@@ -2,7 +2,7 @@
 
 ## Status and goal
 
-This is the planned script for the request vertical slice after it is implemented. The current repository is scaffold-only, so the feature portion is not runnable yet.
+This is the planned script for the complete request vertical slice. The backend API is implemented, but the Vue request views are not, so the end-to-end feature walkthrough is not yet runnable.
 
 The walkthrough should demonstrate one end-to-end idea clearly: Vue collects an internal request, Laravel validates and persists it, and Vue lists and displays the returned resource.
 

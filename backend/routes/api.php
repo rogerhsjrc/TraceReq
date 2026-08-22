@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\TraceRequestController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::get('/requests', [TraceRequestController::class, 'index']);
+Route::post('/requests', [TraceRequestController::class, 'store']);
+Route::get('/requests/{id}', [TraceRequestController::class, 'show']);

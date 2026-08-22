@@ -2,7 +2,7 @@
 
 ## Purpose and source of truth
 
-TraceReq is currently a pair of independent scaffolds:
+TraceReq is a pair of independently served applications:
 
 - `backend/`: Laravel JSON API.
 - `frontend/`: Vue 3 single-page application.
@@ -13,7 +13,7 @@ Read `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, and `docs/MVP.md` before changin
 
 ## Current implementation status
 
-The repository is still framework scaffold code. It does not yet implement request creation, listing, or detail views. Do not describe planned behavior as implemented.
+The Laravel backend implements the create, list, and detail request API. The Vue frontend remains scaffold code and does not yet implement the corresponding request views. Distinguish implemented backend behavior from planned frontend behavior.
 
 The first vertical slice is limited to:
 
