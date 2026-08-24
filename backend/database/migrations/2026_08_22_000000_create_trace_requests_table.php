@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('trace_requests', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('title', 255);
+            $table->string('title', 180);
             $table->text('description');
             $table->decimal('requested_amount', 19, 4);
             $table->char('currency_code', 3);

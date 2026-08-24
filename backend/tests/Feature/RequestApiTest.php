@@ -54,6 +54,33 @@ it('returns validation errors for missing required fields', function () {
         ]);
 });
 
+it('rejects whitespace-only required text fields', function (string $field) {
+    $this->postJson('/api/requests', validRequestPayload([
+        $field => '   ',
+    ]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors($field);
+})->with([
+    'title' => 'title',
+    'description' => 'description',
+]);
+
+it('rejects titles longer than 180 characters', function () {
+    $this->postJson('/api/requests', validRequestPayload([
+        'title' => str_repeat('a', 181),
+    ]))
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors('title');
+});
+
+it('accepts a title containing exactly 180 characters', function () {
+    $this->postJson('/api/requests', validRequestPayload([
+        'title' => str_repeat('a', 180),
+    ]))
+        ->assertCreated()
+        ->assertJsonPath('data.title', str_repeat('a', 180));
+});
+
 it('rejects invalid decimal string amounts', function (string $amount) {
     $this->postJson('/api/requests', validRequestPayload([
         'requested_amount' => $amount,
@@ -63,6 +90,9 @@ it('rejects invalid decimal string amounts', function (string $amount) {
 })->with([
     'zero' => '0',
     'zero with scale' => '0.0000',
+    'multiple zeroes' => '00',
+    'multiple zeroes with two decimals' => '00.00',
+    'multiple zeroes with four decimals' => '000.0000',
     'negative' => '-1',
     'scientific notation' => '1e3',
     'comma separator' => '1,50',

@@ -15,7 +15,7 @@ class StoreTraceRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['bail', 'required', 'string', 'max:255'],
+            'title' => ['bail', 'required', 'string', 'max:180'],
             'description' => ['bail', 'required', 'string', 'max:5000'],
             'requested_amount' => [
                 'bail',
