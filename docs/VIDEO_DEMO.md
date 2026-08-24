@@ -2,7 +2,7 @@
 
 ## Status and goal
 
-This is the planned script for the complete request vertical slice. The backend API is implemented, but the Vue request views are not, so the end-to-end feature walkthrough is not yet runnable.
+This is the script for the implemented request vertical slice. The backend API and Vue request views are complete, so the end-to-end feature walkthrough is runnable with both development servers and a migrated PostgreSQL database.
 
 The walkthrough should demonstrate one end-to-end idea clearly: Vue collects an internal request, Laravel validates and persists it, and Vue lists and displays the returned resource.
 
@@ -15,6 +15,22 @@ The walkthrough should demonstrate one end-to-end idea clearly: Vue collects an 
 - Start Laravel at `http://127.0.0.1:8000` and Vite with its development `/api` proxy targeting Laravel.
 - Open the request list and keep terminals at readable font sizes.
 - Do not show `.env`, tokens, credentials, personal data, or unrelated local changes.
+
+Start the API from `backend/`:
+
+```sh
+php artisan migrate
+php artisan serve --host=127.0.0.1 --port=8000
+```
+
+Start the SPA from `frontend/` in a second terminal:
+
+```sh
+npm install
+npm run dev
+```
+
+Open the URL printed by Vite (normally `http://localhost:5173/requests`). The SPA calls relative `/api` paths, and Vite proxies them to Laravel during development.
 
 ## Timeline
 
