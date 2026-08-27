@@ -10,7 +10,7 @@ The walkthrough should demonstrate one end-to-end idea clearly: Vue collects an 
 
 - Use Node 24 LTS, version 24.12.0 or newer in that line. The previous local Node 22.14.0 runtime was below the package's declared engine requirement.
 - Install backend and frontend dependencies.
-- Start from a fresh, migrated PostgreSQL demo database with a known small dataset.
+- Use a dedicated, migrated PostgreSQL demo database with a known small dataset.
 - Run backend tests and the frontend production build before recording.
 - Start Laravel at `http://127.0.0.1:8000` and Vite with its development `/api` proxy targeting Laravel.
 - Open the request list and keep terminals at readable font sizes.

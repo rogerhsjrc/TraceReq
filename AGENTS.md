@@ -13,7 +13,7 @@ Read `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, and `docs/MVP.md` before changin
 
 ## Current implementation status
 
-The Laravel backend implements the create, list, and detail request API. The Vue frontend remains scaffold code and does not yet implement the corresponding request views. Distinguish implemented backend behavior from planned frontend behavior.
+The Laravel backend implements the create, list, and detail request API. The Vue frontend implements the matching list, create, detail, and client-side not-found routes, together with loading, empty, validation, not-found, and general error states. Distinguish this implemented vertical slice from deferred product capabilities.
 
 The first vertical slice is limited to:
 

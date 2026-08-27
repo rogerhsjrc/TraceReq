@@ -69,7 +69,7 @@ Each slice should leave the relevant checks green. Do not start deferred capabil
 ## Definition of done
 
 - The three API endpoints meet their acceptance criteria.
-- The three SPA routes work against a fresh migrated PostgreSQL database.
+- The three SPA routes work against a dedicated, migrated PostgreSQL demo database with a known small dataset.
 - Backend endpoint tests pass.
 - Backend formatting check passes.
 - Frontend lint and production build pass on Node 24.12.0 or newer within Node 24 LTS.

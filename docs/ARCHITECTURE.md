@@ -132,6 +132,6 @@ The frontend currently has no test runner or Vue component testing library. Veri
 
 ## Deferred evolution
 
-The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. The existing Sanctum-protected `/api/user` route is scaffold code, not implemented product authentication; changing or removing it belongs to feature implementation. Sanctum remains installed for a future authentication increment.
+The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. The generated `/api/user` scaffold route was removed, and the repository currently exposes only the three request endpoints documented above. Sanctum remains installed for a future authentication increment, but no login route, authenticated-user endpoint, session flow, or other product authentication route is currently implemented.
 
 Authentication, authorization, policies, roles, tenant isolation, and tenant context will later change endpoint access and likely add requester/organization ownership to records. Approvals will introduce workflow rules that belong in Domain and Application rather than generic update endpoints. Attachments, comments, notifications, queues, advanced auditing, human-readable sequencing, editing, deletion, searching, filtering, pagination, and production deployment architecture are separate increments with their own decisions and tests.
