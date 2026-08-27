@@ -4,7 +4,7 @@
 
 TraceReq is intended to give a team a small, clear place to record and find internal spending requests. The immediate demonstration proves the basic path from entering a request in a Vue SPA to persisting it through a Laravel JSON API and reading it back.
 
-This is a technical demonstration, not a production release. The Laravel create, list, and detail API is implemented; the Vue request experience remains planned and the frontend is still scaffold code.
+This is a technical demonstration, not a production release. The Laravel create, list, and detail API and the matching Vue request experience are implemented.
 
 ## Immediate user outcome
 

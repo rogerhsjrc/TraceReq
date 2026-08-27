@@ -2,7 +2,7 @@
 
 ## Status
 
-This document records the architecture for the first request vertical slice. The backend request folders and endpoints are implemented; the described frontend feature folders and views remain proposed.
+This document records the implemented architecture for the first request vertical slice. The backend endpoints and matching frontend feature are complete for the controlled local demonstration.
 
 ## System context
 
@@ -18,7 +18,7 @@ The backend owns validation, persistence, ordering, identifiers, and response sh
 
 ## Current repository baseline
 
-The backend is Laravel 13 and now contains the request model, migration, application actions, API controller, Form Request, JSON resource, factory, routes, and focused Pest tests. The unrelated `/api/user` scaffold route and generated example tests were removed; Sanctum remains installed for a future increment. The frontend is still a Vue 3/Vite scaffold with an empty router and the example Pinia counter, with no request API client or request screen.
+The backend is Laravel 13 and contains the request model, migration, application actions, API controller, Form Request, JSON resource, factory, routes, and focused Pest tests. The unrelated `/api/user` scaffold route and generated example tests were removed; Sanctum remains installed for a future increment. The Vue 3/Vite frontend implements the list, create, detail, and client-side not-found routes with a native-fetch API client and route-local server state.
 
 Laravel's configuration fallback remains SQLite, while `.env.example` now documents blank PostgreSQL connection placeholders for local application setup without credentials or machine-specific secrets. PHPUnit selects SQLite `:memory:` for the portable feature tests, subject to the testing limits below.
 
@@ -56,24 +56,31 @@ Laravel framework adapters remain in conventional locations:
 - `backend/database/migrations/`: schema;
 - `backend/tests/Feature/`: endpoint behavior.
 
-The frontend’s infrastructure adapter is a small `frontend/src/features/requests/api/requests.js` module using the native browser `fetch` API. It calls relative `/api` paths; Axios or another HTTP dependency is unnecessary for three calls.
+The frontend's infrastructure adapters are a centralized transport client at `frontend/src/api/http.js` and the request endpoint module at `frontend/src/features/requests/api/requests.js`. They use native browser `fetch` with relative `/api` paths; Axios or another HTTP dependency is unnecessary for three calls.
 
-## Proposed frontend structure
+## Implemented frontend structure
 
 ```text
 frontend/src/
+  api/http.js
+  assets/main.css
   features/requests/
     api/requests.js
+    components/RequestCard.vue
     components/RequestForm.vue
+    components/RequestStatePanel.vue
+    formatters.js
+    types.js
     views/RequestCreateView.vue
     views/RequestListView.vue
     views/RequestDetailView.vue
   router/index.js
+  views/NotFoundView.vue
   App.vue
   main.js
 ```
 
-Use route-level views for `/requests`, `/requests/new`, and `/requests/:id`. Keep loading, error, and response state local to each view. Pinia is installed but is not needed for short-lived server state in this slice; introduce a store only when state must be shared across routes or cached deliberately.
+Route-level views implement `/requests`, `/requests/new`, and `/requests/:id`; `/` redirects to the list and a fallback route presents a useful client-side `404`. Loading, error, and response state remain local to each view. Pinia remains installed but is not wired into the application because short-lived server state does not need a shared store; introduce one only when state must be shared across routes or cached deliberately.
 
 During local development, Vite proxies `/api` to `http://127.0.0.1:8000`. This keeps the independently served SPA and API convenient without adding unnecessary local CORS handling. The proxy is a development arrangement, not a production deployment architecture; a future deployment may use an environment-driven API base URL.
 
@@ -121,10 +128,10 @@ Unit tests cover the `Money` value object and any other standalone domain rule. 
 
 SQLite `:memory:` may provide fast feedback for these initial tests because the first request migration must remain portable. Passing those tests does not validate PostgreSQL-specific constraints, indexes, SQL features, transaction semantics, or concurrency behavior. PostgreSQL integration tests become mandatory before the application relies on any such behavior. The application demonstration itself always runs against PostgreSQL.
 
-The frontend currently has no test runner. Verify it with lint and a production build until frontend testing is separately selected; do not add a testing framework incidentally.
+The frontend currently has no test runner or Vue component testing library. Verify it with lint, a production build, and a manual browser pass until frontend testing is deliberately selected; do not add a testing framework incidentally.
 
 ## Deferred evolution
 
-The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. The existing Sanctum-protected `/api/user` route is scaffold code, not implemented product authentication; changing or removing it belongs to feature implementation. Sanctum remains installed for a future authentication increment.
+The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. The generated `/api/user` scaffold route was removed, and the repository currently exposes only the three request endpoints documented above. Sanctum remains installed for a future authentication increment, but no login route, authenticated-user endpoint, session flow, or other product authentication route is currently implemented.
 
 Authentication, authorization, policies, roles, tenant isolation, and tenant context will later change endpoint access and likely add requester/organization ownership to records. Approvals will introduce workflow rules that belong in Domain and Application rather than generic update endpoints. Attachments, comments, notifications, queues, advanced auditing, human-readable sequencing, editing, deletion, searching, filtering, pagination, and production deployment architecture are separate increments with their own decisions and tests.

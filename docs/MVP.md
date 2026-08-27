@@ -2,7 +2,7 @@
 
 ## Scope statement
 
-The immediate MVP is one complete, demonstrable vertical slice for internal requests: create, list, and view. Its Laravel API is implemented; its Vue views remain to be implemented.
+The immediate MVP is one complete, demonstrable vertical slice for internal requests: create, list, and view. Its Laravel API and Vue views are implemented.
 
 It consists only of `POST /api/requests`, `GET /api/requests`, `GET /api/requests/{id}`, and the matching Vue create, list, and detail views. The local application and recorded demonstration use PostgreSQL.
 
@@ -61,7 +61,7 @@ It has no human-readable reference. The future `REQ-{year}-{sequence}` value is 
 
 1. **Persistence and contract**: add one portable reversible migration for PostgreSQL, one Eloquent model with a Laravel-supported ULID, request validation, one JSON resource, and backend feature tests for the three endpoints.
 2. **Application flow**: add `Money`, `CreateRequestData`, the three small application actions, and thin API controller methods/routes. Actions use Eloquent directly for this CRUD-sized slice.
-3. **SPA flow**: add the native-fetch adapter using relative `/api` paths, a Vite development proxy to `http://127.0.0.1:8000`, three routes/views, form behavior, and loading/error/empty/not-found states.
+3. **SPA flow**: implemented with a centralized native-fetch client using relative `/api` paths, a Vite development proxy to `http://127.0.0.1:8000`, lazy-loaded routes/views, form behavior, and loading/error/empty/not-found states.
 4. **Demo readiness**: seed or create a small deterministic dataset, run checks, and rehearse `docs/VIDEO_DEMO.md`.
 
 Each slice should leave the relevant checks green. Do not start deferred capabilities to make the demonstration appear more complete.
@@ -69,7 +69,7 @@ Each slice should leave the relevant checks green. Do not start deferred capabil
 ## Definition of done
 
 - The three API endpoints meet their acceptance criteria.
-- The three SPA routes work against a fresh migrated PostgreSQL database.
+- The three SPA routes work against a dedicated, migrated PostgreSQL demo database with a known small dataset.
 - Backend endpoint tests pass.
 - Backend formatting check passes.
 - Frontend lint and production build pass on Node 24.12.0 or newer within Node 24 LTS.
@@ -81,7 +81,7 @@ Each slice should leave the relevant checks green. Do not start deferred capabil
 
 Authentication, authorization, policies, roles, tenant isolation, approvals, attachments, comments, notifications, queues, advanced auditing, complete multi-tenancy, human-readable sequence references, editing, deletion, searching, filtering, pagination, production deployment architecture, and request workflow state changes are excluded.
 
-The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. The existing `/api/user` route and installed Sanctum package are scaffold artifacts, not proof of complete product authentication; Sanctum is reserved for a later increment, and route cleanup belongs to feature implementation. The example Pinia store is likewise not product state management. Route-local request data does not justify a store; reserve Pinia for genuinely shared state such as a future authenticated user, roles, or tenant context.
+The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. Sanctum remains installed for a future increment, but there is no implemented product authentication. Pinia likewise remains an installed scaffold dependency but is not wired into the application. Route-local request data does not justify a store; reserve Pinia for genuinely shared state such as a future authenticated user, roles, or tenant context.
 
 ## Risks and mitigations
 
@@ -93,4 +93,4 @@ The three request endpoints are unauthenticated only for a controlled local demo
 | Separate dev servers cannot communicate | Use relative `/api` calls and a Vite development proxy to `http://127.0.0.1:8000` |
 | Demo data varies between runs | Document a repeatable seed/reset procedure when feature code is implemented |
 
-Initial backend tests split into unit coverage for `Money` and any standalone domain rule, plus `RefreshDatabase` feature coverage for creation, validation, persistence, ordering, detail retrieval, consistent serialization, and `404`. SQLite `:memory:` is permitted for this fast portable suite, but it does not validate PostgreSQL-specific behavior. PostgreSQL integration tests are required before introducing database-specific constraints, indexes, concurrency behavior, or SQL features. Frontend verification remains lint and production build because no frontend test runner has been selected.
+Initial backend tests split into unit coverage for `Money` and any standalone domain rule, plus `RefreshDatabase` feature coverage for creation, validation, persistence, ordering, detail retrieval, consistent serialization, and `404`. SQLite `:memory:` is permitted for this fast portable suite, but it does not validate PostgreSQL-specific behavior. PostgreSQL integration tests are required before introducing database-specific constraints, indexes, concurrency behavior, or SQL features. Frontend verification remains lint, production build, and a manual browser pass because no frontend test runner or Vue component testing library has been selected.
