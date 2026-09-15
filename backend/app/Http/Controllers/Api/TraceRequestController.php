@@ -6,6 +6,7 @@ use App\Application\Requests\CreateRequest;
 use App\Application\Requests\CreateRequestData;
 use App\Application\Requests\ListRequests;
 use App\Application\Requests\ViewRequest;
+use App\Application\Requests\SubmitRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTraceRequestRequest;
 use App\Http\Resources\RequestResource;
@@ -39,5 +40,13 @@ class TraceRequestController extends Controller
     public function show(string $id, ViewRequest $viewRequest): RequestResource
     {
         return new RequestResource($viewRequest($id));
+    }
+
+    public function submit(
+        string $id,
+        SubmitRequest $submitRequest
+    ): RequestResource
+    {
+        return new RequestResource($submitRequest($id));
     }
 }

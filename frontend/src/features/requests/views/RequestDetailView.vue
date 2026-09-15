@@ -4,15 +4,17 @@ import { useRoute } from 'vue-router'
 
 import { HttpError } from '@/api/http'
 
-import { getRequest } from '../api/requests'
+import { getRequest, submitRequest } from '../api/requests'
 import RequestStatePanel from '../components/RequestStatePanel.vue'
-import { formatAmount, formatDate } from '../formatters'
+import { formatAmount, formatDate, formatStatus } from '../formatters'
 
 const route = useRoute()
 const request = ref(null)
 const loading = ref(true)
 const notFound = ref(false)
 const error = ref('')
+const submitting = ref(false)
+const submitError = ref('')
 let controller
 
 async function loadRequest() {
@@ -23,7 +25,7 @@ async function loadRequest() {
   request.value = null
   notFound.value = false
   error.value = ''
-
+  submitError.value = ''
   try {
     request.value = await getRequest(String(route.params.id), { signal: activeController.signal })
   } catch (caught) {
@@ -36,6 +38,19 @@ async function loadRequest() {
     }
   } finally {
     if (!activeController.signal.aborted) loading.value = false
+  }
+}
+
+async function handleSubmit(){
+  if(submitting.value || request.value?.status !== 'draft') return;
+    submitting.value = true
+    submitError.value = ''
+  try{
+    request.value = await submitRequest(request.value.id)
+  }catch (error){
+    submitError.value = 'We couldn’t confirm submission. Please try again.'
+  } finally{
+    submitting.value = false
   }
 }
 
@@ -84,10 +99,15 @@ onBeforeUnmount(() => controller?.abort())
           <p class="eyebrow">Request detail</p>
           <h1>{{ request.title }}</h1>
         </div>
-        <p class="detail-amount">
-          <span>Requested amount</span>
-          <strong>{{ formatAmount(request.requested_amount, request.currency_code) }}</strong>
-        </p>
+        <div class="request-card__actions">
+          <span class="badge" :class="`badge--${request.status}`">
+            {{ formatStatus(request.status) }}
+          </span>
+          <p class="detail-amount">
+            <span>Requested amount</span>
+            <strong>{{ formatAmount(request.requested_amount, request.currency_code) }}</strong>
+          </p>
+        </div>
       </header>
 
       <section class="surface detail-section" aria-labelledby="description-title">
@@ -119,6 +139,25 @@ onBeforeUnmount(() => controller?.abort())
             <dd>{{ formatDate(request.updated_at) }}</dd>
           </div>
         </dl>
+      </section>
+      <section>
+        <div v-if="submitError" class="alert alert--error" role="alert">
+          <strong>Submission unsuccessful</strong>
+          <span>{{ submitError }}</span>
+        </div>
+        <div class="form-actions">
+          <button 
+            v-if="request.status === 'draft'"
+            class="button button--primary" 
+            type="button" 
+            :disabled="submitting"
+            @click="handleSubmit"
+            >
+            <span v-if="submitting" 
+            class="spinner spinner--small" aria-hidden="true"></span>
+            {{ submitting ? 'Submitting request...' : 'Submit request' }}
+          </button>
+        </div>
       </section>
     </template>
   </div>

@@ -3,6 +3,11 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
   timeStyle: 'short',
 })
 
+const statusLabels = {
+  draft: 'Draft',
+  submitted: 'Submitted', 
+}
+
 export function formatDate(value) {
   const date = new Date(value)
   return Number.isNaN(date.getTime()) ? value : dateFormatter.format(date)
@@ -13,4 +18,8 @@ export function formatAmount(amount, currencyCode) {
   const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   const decimal = fraction ? `.${fraction}` : ''
   return `${currencyCode} ${groupedInteger}${decimal}`
+}
+
+export function formatStatus(status){
+  return statusLabels[status] ?? status;
 }

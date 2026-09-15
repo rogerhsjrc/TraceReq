@@ -132,7 +132,7 @@ function submit() {
       <RouterLink class="button button--ghost" :to="{ name: 'request-list' }">Cancel</RouterLink>
       <button class="button button--primary" type="submit" :disabled="submitting">
         <span v-if="submitting" class="spinner spinner--small" aria-hidden="true"></span>
-        {{ submitting ? 'Creating request…' : 'Create request' }}
+        {{ submitting ? 'Creating draft…' : 'Save as draft' }}
       </button>
     </div>
   </form>

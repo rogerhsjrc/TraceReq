@@ -6,6 +6,7 @@ use Database\Factories\TraceRequestFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Domain\Requests\RequestStatus;
 
 class TraceRequest extends Model
 {
@@ -19,6 +20,7 @@ class TraceRequest extends Model
         'description',
         'requested_amount',
         'currency_code',
+        'status',
     ];
 
     /** @return array<string, string> */
@@ -26,6 +28,7 @@ class TraceRequest extends Model
     {
         return [
             'requested_amount' => 'decimal:4',
+            'status' => RequestStatus::class,
         ];
     }
 }

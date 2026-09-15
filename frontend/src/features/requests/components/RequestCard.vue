@@ -1,5 +1,5 @@
 <script setup>
-import { formatAmount, formatDate } from '../formatters'
+import { formatAmount, formatDate, formatStatus } from '../formatters'
 
 defineProps({
   request: { type: Object, required: true },
@@ -22,12 +22,17 @@ defineProps({
       </h2>
       <p class="request-card__description">{{ request.description }}</p>
     </div>
-    <RouterLink
-      class="request-card__open"
-      :to="{ name: 'request-detail', params: { id: request.id } }"
-      :aria-label="`View request: ${request.title}`"
-    >
-      View details <span aria-hidden="true">→</span>
-    </RouterLink>
+    <div class="request-card__actions">
+      <span class="badge" :class="`badge--${request.status}`">
+        {{ formatStatus(request.status) }}
+      </span>
+      <RouterLink
+        class="request-card__open"
+        :to="{ name: 'request-detail', params: { id: request.id } }"
+        :aria-label="`View request: ${request.title}`"
+        >
+        View details <span aria-hidden="true">→</span>
+      </RouterLink>
+    </div>
   </article>
 </template>

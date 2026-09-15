@@ -18,6 +18,7 @@ class RequestResource extends JsonResource
             'currency_code' => strtoupper((string) $this->currency_code),
             'created_at' => $this->created_at->toISOString(),
             'updated_at' => $this->updated_at->toISOString(),
+            'status' => $this->status,
         ];
     }
 }

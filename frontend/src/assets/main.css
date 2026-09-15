@@ -157,6 +157,42 @@ h2 {
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+/* Combine .badge with a status modifier, e.g. .badge--draft. */
+.badge {
+  --badge-color: #46524a;
+  --badge-background: #eef1ed;
+  --badge-border: #d3dbd4;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: fit-content;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid var(--badge-border);
+  border-radius: 999px;
+  color: var(--badge-color);
+  background: var(--badge-background);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Add future statuses by overriding these three color properties. */
+.badge--draft {
+  --badge-color: #46524a;
+  --badge-background: #eef1ed;
+  --badge-border: #d3dbd4;
+}
+
+.badge--submitted {
+  --badge-color: var(--brand-dark);
+  --badge-background: var(--brand-soft);
+  --badge-border: #cbd9d1;
+}
 
 main {
   flex: 1;
@@ -399,6 +435,13 @@ main {
 .back-link:hover {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.request-card__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .surface {

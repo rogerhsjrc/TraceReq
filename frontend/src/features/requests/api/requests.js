@@ -20,3 +20,11 @@ export async function createRequest(input, options = {}) {
   const response = await http('/api/requests', { ...options, method: 'POST', body: input })
   return response.data
 }
+/**
+ * @param {import('../types').SubmitRequest} input
+ * @returns {Promise<import('../types').SubmitRequest}
+ */
+export async function submitRequest(id, options = {}){
+  const response = await http(`/api/requests/${encodeURIComponent(id)}/submit`, {...options, method: 'POST'})
+  return response.data
+}

@@ -4,6 +4,7 @@ namespace App\Application\Requests;
 
 use App\Domain\Requests\Money;
 use App\Models\TraceRequest;
+use App\Domain\Requests\RequestStatus;
 
 final class CreateRequest
 {
@@ -16,6 +17,7 @@ final class CreateRequest
             'description' => $data->description,
             'requested_amount' => $money->amount(),
             'currency_code' => $money->currencyCode(),
+            'status' => RequestStatus::Draft,
         ]);
     }
 }
