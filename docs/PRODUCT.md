@@ -4,19 +4,22 @@
 
 TraceReq is intended to give a team a small, clear place to record and find internal spending requests. The immediate demonstration proves the basic path from entering a request in a Vue SPA to persisting it through a Laravel JSON API and reading it back.
 
-This is a technical demonstration, not a production release. The Laravel create, list, and detail API and the matching Vue request experience are implemented.
+The recorded create/list/view MVP was successfully presented, as confirmed by the project owner on 2026-09-24. Development now explores Laravel and Vue through focused feature increments. This remains an unauthenticated local learning application, not a production-ready release.
+
+The first subsequent increment adds persisted drafts and explicit submission. Future features should state their learning objective, acceptance criteria, architectural impact, and verification. Deferred capabilities are candidates for separately scoped work, not automatically part of the current feature.
 
 ## Immediate user outcome
 
 A demo user can:
 
-1. create an internal request with the minimum business information;
+1. save a complete internal request as a draft;
 2. see a newest-first list of requests;
-3. open a request and see its complete saved information.
+3. open a request and review its complete saved information;
+4. submit the draft while preserving its identity and business fields.
 
 The slice should make the Laravel/Vue boundary easy to explain in five minutes: browser form, API validation, application input, domain-safe money handling, Eloquent persistence in PostgreSQL, JSON response, and Vue rendering.
 
-## Proposed minimum request record
+## Current request record
 
 The first implementation keeps one request record with only:
 
@@ -25,15 +28,19 @@ The first implementation keeps one request record with only:
 - description;
 - requested amount, serialized as a decimal string;
 - ISO 4217 currency code;
-- creation and update timestamps.
+- creation and update timestamps;
+- status, serialized as `draft` or `submitted`.
 
-No human-readable request reference is required in this slice. The broader data dictionary's future `REQ-{year}-{sequence}` direction depends on organization-aware sequencing and transactional behavior, so it remains deferred until the relevant multi-tenant functionality exists. Category, priority, request type, workflow status, organization, requester identity, approvals, attachments, comments, audit fields, and subtype detail tables likewise belong to later product decisions.
+No human-readable request reference is required in this increment. The broader data dictionary's future `REQ-{year}-{sequence}` direction depends on organization-aware sequencing and transactional behavior, so it remains deferred. Category, priority, request type, organization, requester identity, approvals, attachments, comments, audit fields, and subtype detail tables likewise belong to later product decisions.
 
 Money must never be calculated or serialized with floating-point values. The API boundary represents `requested_amount` as a decimal string.
 
 ## Success criteria
 
-- Valid form input creates one durable record through the API.
+- Valid form input creates one durable draft through the API; the server chooses its initial status.
+- Submission changes the same record to `submitted`; sequential retries return it without further changes.
+- Drafts require all existing fields. Incomplete drafts and editing are not implemented.
+- Submission errors keep details visible, clear on retry, and do not leak into another request after navigation.
 - Invalid input produces field-level errors that the SPA can show.
 - The list displays persisted requests in a stable newest-first order.
 - A direct detail URL loads the selected request or a clear not-found state.
@@ -41,10 +48,10 @@ Money must never be calculated or serialized with floating-point values. The API
 - The local application and recorded demonstration persist records in PostgreSQL.
 - The walkthrough can show one focused backend test and a successful frontend production build.
 
-## Explicitly outside the first implementation
+## Deferred capabilities
 
 - sign-in, sessions, API tokens, users, roles, and permissions;
-- approval or rejection workflows and status transitions;
+- approval, rejection, cancellation, and transitions beyond draft to submitted;
 - file attachments and comments;
 - notifications, queues, email, and real-time updates;
 - immutable event history or advanced auditing;

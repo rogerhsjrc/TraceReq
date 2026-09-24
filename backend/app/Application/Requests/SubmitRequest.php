@@ -2,16 +2,17 @@
 
 namespace App\Application\Requests;
 
-use App\Models\TraceRequest;
 use App\Domain\Requests\RequestStatus;
+use App\Models\TraceRequest;
 
-final class SubmitRequest{
+final class SubmitRequest
+{
     public function __invoke(string $id): TraceRequest
     {
         $traceRequest = TraceRequest::findOrFail($id);
 
-        //If request has already submitted just return it 
-        if($traceRequest->status === RequestStatus::Submitted){
+        // If request has already submitted just return it
+        if ($traceRequest->status === RequestStatus::Submitted) {
             return $traceRequest;
         }
 

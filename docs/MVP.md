@@ -1,4 +1,29 @@
-# Immediate MVP plan
+# Completed MVP and subsequent learning increments
+
+## Milestone completed
+
+The recorded MVP was successfully presented, as confirmed by the project owner on 2026-09-24. The original plan below is retained as milestone history, not a restriction on all future development. The recording requirement is complete.
+
+## Current learning phase
+
+New features explore Laravel and Vue behavior and complexity. Each increment should identify its learning objective, user behavior, domain rules, API changes, persistence implications, tests, and exclusions. Keep the pragmatic architecture and introduce abstractions when a concrete requirement justifies them.
+
+### Implemented increment: draft review and submission
+
+- Creation saves a complete `draft`; client input cannot choose its initial status.
+- List and detail display formatted status badges.
+- `POST /api/requests/{id}/submit` updates the same record to `submitted` and returns HTTP 200; unknown IDs return JSON 404.
+- Submission preserves identity, business fields, and creation time. Sequential retries preserve the entire saved record, including timestamps.
+- The detail button is shown for drafts, disabled while pending, and hidden after success. Errors keep details visible and clear on retry; stale submission responses cannot overwrite another request after navigation.
+- The current API representation adds string `status` to the original fields below.
+
+Learning topics include backed enums and Eloquent casts, reversible migrations, invokable actions, HTTP feature tests, idempotent retries, and asynchronous Vue state ownership.
+
+Completion checks are backend tests and Pint, frontend build/lint, and a manual browser pass against PostgreSQL including failure, retry, and navigation while pending. See `REQUEST_SUBMISSION_TESTING.md`. SQLite tests do not prove PostgreSQL or concurrency behavior. Incomplete drafts, editing, approvals, authentication, and additional states remain outside this increment.
+
+## Historical recording plan
+
+The remaining sections describe the completed original MVP. Consult `PRODUCT.md` and `ARCHITECTURE.md` for current scope and contracts.
 
 ## Scope statement
 

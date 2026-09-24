@@ -1,5 +1,7 @@
 # Five-minute technical walkthrough
 
+The MVP recording was successfully presented, as confirmed by the project owner on 2026-09-24. This script is retained as the original milestone reference. Current development additionally includes drafts and submission; see `MVP.md` and `ARCHITECTURE.md` for the learning phase and current contract.
+
 ## Status and goal
 
 This is the script for the implemented request vertical slice. The backend API and Vue request views are complete, so the end-to-end feature walkthrough is runnable with both development servers and a migrated PostgreSQL database.

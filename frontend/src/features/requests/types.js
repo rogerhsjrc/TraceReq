@@ -7,6 +7,7 @@
  * @property {string} currency_code
  * @property {string} created_at
  * @property {string} updated_at
+ * @property {string} status
  */
 
 /**

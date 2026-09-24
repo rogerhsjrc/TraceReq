@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Domain\Requests\RequestStatus;
 use Database\Factories\TraceRequestFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Domain\Requests\RequestStatus;
 
 class TraceRequest extends Model
 {

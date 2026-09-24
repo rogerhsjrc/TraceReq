@@ -16,8 +16,12 @@ const error = ref('')
 const submitting = ref(false)
 const submitError = ref('')
 let controller
+let submissionVersion = 0
 
 async function loadRequest() {
+
+  invalidateSubmission()
+
   controller?.abort()
   const activeController = new AbortController()
   controller = activeController
@@ -43,19 +47,42 @@ async function loadRequest() {
 
 async function handleSubmit(){
   if(submitting.value || request.value?.status !== 'draft') return;
+
+    const requestId = request.value.id
+    const version = ++submissionVersion
+
+    const isCurrentSubmission = () =>
+      version === submissionVersion &&
+      String(route.params.id) === requestId
+
     submitting.value = true
     submitError.value = ''
   try{
-    request.value = await submitRequest(request.value.id)
-  }catch (error){
-    submitError.value = 'We couldn’t confirm submission. Please try again.'
-  } finally{
-    submitting.value = false
+    const updateRequest = await submitRequest(request.value.id)
+    if(isCurrentSubmission()){
+      request.value = updateRequest
+    }else
+      console.log("Te cambiaste de solicitud")
+  } catch {
+    if(isCurrentSubmission())
+      submitError.value = 'We couldn’t confirm submission. Please try again.'
+  } finally {
+    if(isCurrentSubmission())
+      submitting.value = false
   }
 }
 
+function invalidateSubmission(){
+  submissionVersion += 1
+  submitting.value = false
+  submitError.value = ''
+}
+
 watch(() => route.params.id, loadRequest, { immediate: true })
-onBeforeUnmount(() => controller?.abort())
+onBeforeUnmount(() => {
+  controller?.abort()
+  invalidateSubmission()
+})
 </script>
 
 <template>
@@ -146,14 +173,14 @@ onBeforeUnmount(() => controller?.abort())
           <span>{{ submitError }}</span>
         </div>
         <div class="form-actions">
-          <button 
+          <button
             v-if="request.status === 'draft'"
-            class="button button--primary" 
-            type="button" 
+            class="button button--primary"
+            type="button"
             :disabled="submitting"
             @click="handleSubmit"
             >
-            <span v-if="submitting" 
+            <span v-if="submitting"
             class="spinner spinner--small" aria-hidden="true"></span>
             {{ submitting ? 'Submitting request...' : 'Submit request' }}
           </button>

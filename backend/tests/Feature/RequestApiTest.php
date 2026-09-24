@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Requests\RequestStatus;
 use App\Models\TraceRequest;
 use Illuminate\Support\Str;
 
@@ -11,6 +12,7 @@ const REQUEST_RESOURCE_FIELDS = [
     'currency_code',
     'created_at',
     'updated_at',
+    'status',
 ];
 
 it('creates a request with the exact normalized resource representation', function () {
@@ -185,6 +187,19 @@ it('returns a JSON 404 for a malformed identifier', function () {
     $this->getJson('/api/requests/not-a-ulid')
         ->assertNotFound()
         ->assertJsonStructure(['message']);
+});
+
+it('creates a draft regardless of client supplied status', function () {
+    $response = $this->postJson('/api/requests', validRequestPayload([
+        'status' => RequestStatus::Submitted->value,
+    ]));
+
+    $response->assertCreated()->assertJsonPath('data.status', RequestStatus::Draft);
+
+    $this->assertDatabaseHas('trace_requests', [
+        'id' => $response->json('data.id'),
+        'status' => RequestStatus::Draft->value,
+    ]);
 });
 
 function validRequestPayload(array $overrides = []): array

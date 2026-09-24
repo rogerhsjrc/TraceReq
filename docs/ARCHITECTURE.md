@@ -2,7 +2,7 @@
 
 ## Status
 
-This document records the implemented architecture for the first request vertical slice. The backend endpoints and matching frontend feature are complete for the controlled local demonstration.
+The recorded create/list/view MVP was successfully presented. This document records the current architecture, including the subsequent draft/submission feature. Development now explores Laravel and Vue through bounded, tested features. The application remains an unauthenticated local learning demo, not production-ready.
 
 ## System context
 
@@ -39,6 +39,9 @@ Domain code, when introduced, must not import HTTP requests, controllers, or Vue
 - `CreateRequest`
 - `ListRequests`
 - `ViewRequest`
+- `SubmitRequest`
+
+The Domain concern includes the string-backed `RequestStatus` enum (`Draft`, `Submitted`). `CreateRequest` assigns Draft on the server; status is not part of `CreateRequestData`. `SubmitRequest` updates the existing record and returns an already-submitted record unchanged.
 
 Actions coordinate the operation and make the walkthrough explicit. For this simple slice they may query an Eloquent model directly. Do not add repository interfaces merely to hide Eloquent, and do not create both “service” and “action” layers for the same behavior.
 
@@ -56,7 +59,7 @@ Laravel framework adapters remain in conventional locations:
 - `backend/database/migrations/`: schema;
 - `backend/tests/Feature/`: endpoint behavior.
 
-The frontend's infrastructure adapters are a centralized transport client at `frontend/src/api/http.js` and the request endpoint module at `frontend/src/features/requests/api/requests.js`. They use native browser `fetch` with relative `/api` paths; Axios or another HTTP dependency is unnecessary for three calls.
+The frontend's infrastructure adapters are a centralized transport client at `frontend/src/api/http.js` and the request endpoint module at `frontend/src/features/requests/api/requests.js`. They use native browser `fetch` with relative `/api` paths; Axios or another HTTP dependency is unnecessary for these four calls.
 
 ## Implemented frontend structure
 
@@ -84,19 +87,24 @@ Route-level views implement `/requests`, `/requests/new`, and `/requests/:id`; `
 
 During local development, Vite proxies `/api` to `http://127.0.0.1:8000`. This keeps the independently served SPA and API convenient without adding unnecessary local CORS handling. The proxy is a development arrangement, not a production deployment architecture; a future deployment may use an environment-driven API base URL.
 
-## Proposed API contract
+## Current API contract
 
 All endpoints are unauthenticated for the local first demo only:
 
 | Method | Path | Use case | Expected result |
 |---|---|---|---|
-| `POST` | `/api/requests` | Create | `201` with the saved request |
+| `POST` | `/api/requests` | Create | `201` with the saved draft |
 | `GET` | `/api/requests` | List | `200` with a newest-first collection |
 | `GET` | `/api/requests/{id}` | View | `200` with one request; `404` if absent |
+| `POST` | `/api/requests/{id}/submit` | Submit | `200` with the submitted request; JSON `404` if absent |
 
-Validation failures should use Laravel’s standard JSON `422` structure. Resources should keep a consistent request representation across create, list, and detail. The list may return an unpaginated collection for the tiny demo dataset; pagination should be added only when the product needs it.
+Validation failures should use Laravel’s standard JSON `422` structure. Resources should keep a consistent request representation across create, list, detail, and submission. The list may return an unpaginated collection for the tiny demo dataset; pagination should be added only when the product needs it.
 
-Every response record contains exactly `id`, `title`, `description`, `requested_amount`, `currency_code`, `created_at`, and `updated_at`. The server generates `id` as a Laravel-supported ULID. `requested_amount` is always a decimal string; neither calculations nor serialization may use floating-point values. There is no human-readable request reference in this slice.
+Every response record contains exactly `id`, `title`, `description`, `requested_amount`, `currency_code`, `created_at`, `updated_at`, and `status`. The server generates `id` as a Laravel-supported ULID. `requested_amount` is always a decimal string; neither calculations nor serialization may use floating-point values. There is no human-readable request reference in this increment.
+
+Creation always returns a complete draft, regardless of client-supplied status. The additive reversible migration adds a string status column with a `draft` default, including for existing rows. Eloquent casts it to `RequestStatus`; the enum does not create a database allowed-values constraint. Submission preserves identity and business fields. Sequential retries preserve timestamps; the current read/check/save operation does not guarantee concurrent submissions avoid duplicate writes.
+
+The Vue detail view owns `submitting`, `submitError`, and a submission version guard. It disables Submit while pending, updates from the returned resource, clears errors on retry, and invalidates stale submission results on route changes/unmount. The native-fetch request API module owns HTTP calls. No shared store is required.
 
 ## Dependency direction
 
@@ -124,7 +132,7 @@ Outer adapters may depend inward on application/domain concepts. Domain code mus
 
 ## Testing strategy
 
-Unit tests cover the `Money` value object and any other standalone domain rule. Feature tests use `RefreshDatabase` and cover creation, validation, persistence, deterministic newest-first ordering, successful detail retrieval, consistent serialization across endpoints, and `404`.
+Unit tests cover the `Money` value object and any other standalone domain rule. Feature tests use `RefreshDatabase` and cover creation, validation, persistence, deterministic newest-first ordering, successful detail retrieval, consistent serialization, server-owned draft creation, submission preserving business fields, sequential retries preserving timestamps, and JSON `404` for unknown submission IDs.
 
 SQLite `:memory:` may provide fast feedback for these initial tests because the first request migration must remain portable. Passing those tests does not validate PostgreSQL-specific constraints, indexes, SQL features, transaction semantics, or concurrency behavior. PostgreSQL integration tests become mandatory before the application relies on any such behavior. The application demonstration itself always runs against PostgreSQL.
 
@@ -132,6 +140,6 @@ The frontend currently has no test runner or Vue component testing library. Veri
 
 ## Deferred evolution
 
-The three request endpoints are unauthenticated only for a controlled local demonstration and must not be exposed publicly in that form. The generated `/api/user` scaffold route was removed, and the repository currently exposes only the three request endpoints documented above. Sanctum remains installed for a future authentication increment, but no login route, authenticated-user endpoint, session flow, or other product authentication route is currently implemented.
+The four request endpoints are unauthenticated only for controlled local learning and demonstration and must not be exposed publicly in that form. The generated `/api/user` scaffold route was removed. Sanctum remains installed for a future authentication increment, but no product authentication route or session flow is implemented.
 
 Authentication, authorization, policies, roles, tenant isolation, and tenant context will later change endpoint access and likely add requester/organization ownership to records. Approvals will introduce workflow rules that belong in Domain and Application rather than generic update endpoints. Attachments, comments, notifications, queues, advanced auditing, human-readable sequencing, editing, deletion, searching, filtering, pagination, and production deployment architecture are separate increments with their own decisions and tests.

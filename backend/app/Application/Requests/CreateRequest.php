@@ -3,8 +3,8 @@
 namespace App\Application\Requests;
 
 use App\Domain\Requests\Money;
-use App\Models\TraceRequest;
 use App\Domain\Requests\RequestStatus;
+use App\Models\TraceRequest;
 
 final class CreateRequest
 {

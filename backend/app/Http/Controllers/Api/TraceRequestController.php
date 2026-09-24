@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Application\Requests\CreateRequest;
 use App\Application\Requests\CreateRequestData;
 use App\Application\Requests\ListRequests;
-use App\Application\Requests\ViewRequest;
 use App\Application\Requests\SubmitRequest;
+use App\Application\Requests\ViewRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTraceRequestRequest;
 use App\Http\Resources\RequestResource;
@@ -45,8 +45,7 @@ class TraceRequestController extends Controller
     public function submit(
         string $id,
         SubmitRequest $submitRequest
-    ): RequestResource
-    {
+    ): RequestResource {
         return new RequestResource($submitRequest($id));
     }
 }

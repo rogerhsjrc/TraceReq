@@ -22,6 +22,7 @@ class TraceRequestFactory extends Factory
                 '2500.7500',
             ]),
             'currency_code' => fake()->randomElement(['ARS', 'EUR', 'USD']),
+            'status' => 'draft',
         ];
     }
 }

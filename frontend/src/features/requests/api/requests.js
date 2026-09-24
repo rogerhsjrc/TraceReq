@@ -21,8 +21,8 @@ export async function createRequest(input, options = {}) {
   return response.data
 }
 /**
- * @param {import('../types').SubmitRequest} input
- * @returns {Promise<import('../types').SubmitRequest}
+ * @param {string} id
+ * @returns {Promise<import('../types').TraceRequest>}
  */
 export async function submitRequest(id, options = {}){
   const response = await http(`/api/requests/${encodeURIComponent(id)}/submit`, {...options, method: 'POST'})

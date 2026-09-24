@@ -1,6 +1,6 @@
 # Testing draft and submitted requests
 
-This guide covers the proposed extension to the original create/list/view slice. It is a testing plan with example tests, not a claim that these tests are installed or passing. PRODUCT.md, ARCHITECTURE.md, and MVP.md still need to be reconciled with the new status contract.
+This guide explains tests for the implemented extension to the completed create/list/view MVP. Tests now exist in `backend/tests/Feature/RequestApiTest.php` and `SubmitRequestTest.php`; examples below explain their intent. Consult those files for the executable versions. Manual browser checks remain a separate verification step.
 
 The application is an unauthenticated local demo, not production-ready.
 
@@ -22,7 +22,7 @@ These tests cover sequential retries. They do not prove concurrency guarantees.
 
 ## 2. Update existing API contract tests
 
-In `backend/tests/Feature/RequestApiTest.php`, append `'status'` to `REQUEST_RESOURCE_FIELDS` after `'updated_at'`, matching the resource's current order. Add `draft` assertions to the create response and `assertDatabaseHas` expectation. The three currently failing tests detect this intentional response-shape change.
+In `backend/tests/Feature/RequestApiTest.php`, append `'status'` to `REQUEST_RESOURCE_FIELDS` after `'updated_at'`, matching the resource's current order. Add `draft` assertions to the create response and `assertDatabaseHas` expectation. These assertions now include status and protect the current response shape.
 
 Add this test in that same file, where `validRequestPayload()` already exists:
 
@@ -45,7 +45,7 @@ Also keep a creation assertion without a supplied status; this is the normal UI 
 
 ## 3. Add endpoint tests for submission
 
-Create `backend/tests/Feature/SubmitRequestTest.php`. Existing `tests/Pest.php` already applies Laravel's test case and `RefreshDatabase` to Feature tests; do not duplicate that setup. Exercise the real HTTP endpoint and database rather than mocking the action: this validates routing, the controller, action, enum cast, persistence, and JSON serialization together.
+The tests now live in `backend/tests/Feature/SubmitRequestTest.php`. For a new feature file, run `php artisan make:test YourFeatureTest --pest` from `backend/`; do not overwrite the existing submission tests. Existing `tests/Pest.php` already applies Laravel's test case and `RefreshDatabase` to Feature tests; do not duplicate that setup. Exercise the real HTTP endpoint and database rather than mocking the action: this validates routing, the controller, action, enum cast, persistence, and JSON serialization together.
 
 ```php
 <?php
@@ -139,8 +139,8 @@ No frontend test runner has been selected in this project. Start with these manu
 1. Create a request. Confirm Draft in the list and detail page, and a visible Submit button.
 2. Submit it. Confirm the loading label and disabled button while pending, then Submitted and no Submit button. Refresh and revisit the list to verify persistence.
 3. Open a different draft. After details load, set the browser's Network panel to Offline. Submit: the inline alert should appear, details should remain, and the button should become enabled again.
-4. Restore networking and retry. The alert must clear when retry starts and stay cleared after success. This exposes the current missing `submitError.value = ''` at the start of `handleSubmit`.
-5. Throttle the network, submit draft A, and navigate to request B while the POST is pending. When A completes, B must remain on screen without A's data or error. This exposes the current missing lifecycle guard for submission. An aborted HTTP request may still have been processed by the server; verify A by loading it again.
+4. Restore networking and retry. The alert must clear when retry starts and stay cleared after success. This verifies the error reset at the start of `handleSubmit`.
+5. Throttle the network, submit draft A, and navigate to request B while the POST is pending. When A completes, B must remain on screen without A's data or error. This verifies the submission version guard and invalidation on navigation. An aborted HTTP request may still have been processed by the server; verify A by loading it again.
 6. Check the alert with keyboard/screen-reader use, and inspect badge/button layout at narrow widths.
 
 When a frontend runner is deliberately selected, automate these component behaviors using mocked API promises: pending, resolution, rejection, retry, and navigation before resolution. Verify displayed labels, disabled state, and absence of stale updates. Keep real persistence covered by backend tests. Formatter cases should include `draft`, `submitted`, and the chosen unknown-status fallback.

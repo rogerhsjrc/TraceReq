@@ -13,9 +13,11 @@ Read `docs/PRODUCT.md`, `docs/ARCHITECTURE.md`, and `docs/MVP.md` before changin
 
 ## Current implementation status
 
-The Laravel backend implements the create, list, and detail request API. The Vue frontend implements the matching list, create, detail, and client-side not-found routes, together with loading, empty, validation, not-found, and general error states. Distinguish this implemented vertical slice from deferred product capabilities.
+The recorded create/list/view MVP was successfully presented. Development now proceeds through explicitly scoped features to explore Laravel and Vue. The current increment adds complete draft creation and `POST /api/requests/{id}/submit`, with a string `status` (`draft` or `submitted`) in every response. `RequestStatus` belongs in Domain; `SubmitRequest` is an invokable Application action. The historical first-slice limits below describe the recording, not a permanent ban on later requested features. Authentication, approvals, editing, and other deferred capabilities remain unimplemented. See the current contracts in `docs/` before extending scope.
 
-The first vertical slice is limited to:
+The Laravel backend implements the create, list, detail, and submit request API. The Vue frontend implements the matching list, create, detail, and client-side not-found routes, status badges, submission controls, and loading, empty, validation, not-found, and general error states. Distinguish implemented behavior from deferred capabilities.
+
+The completed recording's original vertical slice was limited to:
 
 - creating an internal request;
 - listing internal requests;
@@ -23,14 +25,14 @@ The first vertical slice is limited to:
 
 Do not add authentication, authorization, approvals, attachments, notifications, advanced audit trails, or complete multi-tenancy as part of that slice. An unauthenticated local demo is not production-ready; say so explicitly.
 
-Its request record contains only a server-generated ULID `id`, `title`, `description`, decimal-string `requested_amount`, `currency_code`, `created_at`, and `updated_at`. A human-readable request reference is deferred until organization-aware sequencing exists.
+The current request record contains a server-generated ULID `id`, `title`, `description`, decimal-string `requested_amount`, `currency_code`, `created_at`, `updated_at`, and string `status`. A human-readable request reference is deferred until organization-aware sequencing exists.
 
 ## Architectural direction
 
 Use three concerns pragmatically:
 
 - **Domain** names business concepts and holds business rules only when they exist.
-- **Application** coordinates the `CreateRequest`, `ListRequests`, and `ViewRequest` use cases; validated create input crosses this boundary in a `CreateRequestData` DTO.
+- **Application** coordinates the `CreateRequest`, `ListRequests`, `ViewRequest`, and `SubmitRequest` use cases; validated create input crosses this boundary in a `CreateRequestData` DTO. The server assigns Draft; status is not create-input data.
 - **Infrastructure** contains Laravel HTTP routing, validation, JSON resources, Eloquent persistence, migrations, and the Vue API adapter.
 
 Add a `Money` value object because fixed-precision monetary handling is a genuine reusable domain concern. Keep Laravel conventions visible: application actions deliberately use Eloquent directly for this CRUD-sized slice. Defer repository contracts until persistence substitution, complex aggregate persistence, tenant-aware queries, or workflow complexity creates a concrete need. Do not introduce a generic service layer, DTO hierarchies, event buses, empty placeholder folders, or a Pinia store without a concrete need. Controllers should translate HTTP input/output, not contain the use case. Vue views should compose feature components and call a small request API module using native `fetch` and relative `/api` paths.
